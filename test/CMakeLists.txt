@@ -1,18 +1,28 @@
+# ------------------------------------------------------------------------------
+# Project: Cadence Math Library
+# Copyright (c) 2025, Onur Tuncer, PhD, Istanbul Technical University
+#
+# SPDX-License-Identifier: MIT
+# License-Filename: LICENSE
+# ------------------------------------------------------------------------------
 
+find_package(Catch2 REQUIRED)
 
-# Fetch Catch2
-include(FetchContent)
-FetchContent_Declare(
-    Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG        v3.5.3 # or latest stable
+add_executable(${PROJECT_NAME}Tests
+  test_Matrix.cpp
+  #test_Vector.cpp 
+  #test_Transform.cpp
+
 )
-FetchContent_MakeAvailable(Catch2)
 
-# Tests
+target_include_directories(${PROJECT_NAME}Tests
+  PRIVATE
+    ${PROJECT_SOURCE_DIR}/  # adjust if your headers are elsewhere
+)
+
+target_link_libraries(${PROJECT_NAME}Tests PRIVATE
+  Catch2::Catch2WithMain
+)
+
 enable_testing()
-add_executable(vec_tests test/test_vector.cpp)
-target_link_libraries(vector_tests PRIVATE Cadence Catch2::Catch2WithMain)
-
-include(CTest)
-catch_discover_tests(vector_tests)
+add_test(NAME ${PROJECT_NAME}Tests COMMAND ${PROJECT_NAME}Tests)
