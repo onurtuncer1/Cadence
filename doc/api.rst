@@ -1,10 +1,10 @@
-------------------------------------------------------------------------------
+.. ------------------------------------------------------------------------------
 .. Project: Cadence Math Library
 .. Copyright (c) 2025, Onur Tuncer, PhD, Istanbul Technical University
 ..
 .. SPDX-License-Identifier: MIT
 .. License-Filename: LICENSE
-------------------------------------------------------------------------------
+.. ------------------------------------------------------------------------------
 
 .. _api:
 
@@ -22,16 +22,6 @@ This is the API reference for the Cadence Math Library. It includes templated cl
    :private-members:
    :undoc-members:
    :outline:
-   :allow-dot-graphs:
-
-.. doxygenclass:: Cadence::Transform
-   :project: Cadence
-   :members:
-   :protected-members:
-   :private-members:
-   :undoc-members:
-   :outline:
-   :allow-dot-graphs:
 
 .. doxygenclass:: Cadence::Matrix
    :project: Cadence
@@ -40,7 +30,20 @@ This is the API reference for the Cadence Math Library. It includes templated cl
    :private-members:
    :undoc-members:
    :outline:
-   :allow-dot-graphs:
+
+.. doxygenclass:: Cadence::Transform
+   :project: Cadence
+   :members:
+   :outline:
+
+.. doxygenconcept:: Cadence::MatrixExpression
+   :project: Cadence
+
+.. doxygenconcept:: Cadence::SymmetricPositiveDefinite
+   :project: Cadence
+
+.. doxygenfunction:: Cadence::cholesky
+   :project: Cadence
 
 ----
 

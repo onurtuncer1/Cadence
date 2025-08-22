@@ -13,7 +13,7 @@
 .. _mainpage:
 
 Cadence C++ API Documentation
-============================
+==============================
 
 Welcome to Cadence library documentation!
 

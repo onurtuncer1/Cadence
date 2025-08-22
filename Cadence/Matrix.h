@@ -26,6 +26,14 @@
 namespace Cadence
 {
 
+// Forward-declare Matrix so we can name it in the function prototype
+template<std::floating_point T, std::size_t Rows, std::size_t Cols>
+class Matrix;
+
+// Forward-declare the free-function determinant used by Matrix::determinant()
+template<std::floating_point T, std::size_t N>
+constexpr T determinant(const Matrix<T, N, N>& m);
+
 struct NoInit{};
 
 /**
@@ -185,11 +193,11 @@ public:
 		return result;
 	}
 
-	// /** @brief Determinant (square only) */     //TODO [Onur] looks like we need a forward decleration of determinant 
-	// constexpr T determinant() const requires(Rows == Cols)
-	// {
-	// 	return Cadence::determinant(*this);
-	// }
+	/** @brief Determinant (square only) */     //TODO [Onur] looks like we need a forward decleration of determinant 
+	constexpr T determinant() const requires(Rows == Cols)
+	{
+		return Cadence::determinant(*this);
+	}
 
 	/** @brief Check for NaNs */
 	constexpr bool has_nan() const
@@ -271,96 +279,96 @@ public:
 	}
 };
 
-// /** @brief Eigen-style compile-time insertion */
-// template<std::floating_point T, std::size_t Rows, std::size_t Cols>
-// struct MatrixInserter {
-// 	std::array<T, Rows *Cols> buffer{};
-// 	std::size_t index = 0;
+/** @brief Eigen-style compile-time insertion */
+template<std::floating_point T, std::size_t Rows, std::size_t Cols>
+struct MatrixInserter {
+	std::array<T, Rows *Cols> buffer{};
+	std::size_t index = 0;
 
-// 	constexpr MatrixInserter &operator, (T value)
-// 	{
-// 		buffer[index++] = value;
-// 		return *this;
-// 	}
+	constexpr MatrixInserter &operator, (T value)
+	{
+		buffer[index++] = value;
+		return *this;
+	}
 
-// 	constexpr operator Matrix<T, Rows, Cols>() const
-// 	{
-// 		Matrix<T, Rows, Cols> mat;
+	constexpr operator Matrix<T, Rows, Cols>() const
+	{
+		Matrix<T, Rows, Cols> mat;
 
-// 		for (std::size_t i = 0; i < Rows; ++i)
-// 			for (std::size_t j = 0; j < Cols; ++j) {
-// 				mat(i, j) = buffer[i * Cols + j];
-// 			}
+		for (std::size_t i = 0; i < Rows; ++i)
+			for (std::size_t j = 0; j < Cols; ++j) {
+				mat(i, j) = buffer[i * Cols + j];
+			}
 
-// 		return mat;
-// 	}
-// };
+		return mat;
+	}
+};
 
-// /** @brief Start matrix insertion */
-// template<std::floating_point T, std::size_t Rows, std::size_t Cols>
-// constexpr MatrixInserter<T, Rows, Cols> operator<<(const Matrix<T, Rows, Cols> &, T value)
-// {
-// 	MatrixInserter<T, Rows, Cols> inserter{};
-// 	inserter.buffer[0] = value;
-// 	inserter.index = 1;
-// 	return inserter;
-// }
+/** @brief Start matrix insertion */
+template<std::floating_point T, std::size_t Rows, std::size_t Cols>
+constexpr MatrixInserter<T, Rows, Cols> operator<<(const Matrix<T, Rows, Cols> &, T value)
+{
+	MatrixInserter<T, Rows, Cols> inserter{};
+	inserter.buffer[0] = value;
+	inserter.index = 1;
+	return inserter;
+}
 
-// /** @brief Determinant helpers and implementation */
-// template<std::floating_point T, std::size_t N>
-// constexpr T determinant(const Matrix<T, N, N> &m);
+/** @brief Determinant helpers and implementation */
+template<std::floating_point T, std::size_t N>
+constexpr T determinant(const Matrix<T, N, N> &m);
 
-// template<std::floating_point T>
-// constexpr T determinant(const Matrix<T, 1, 1> &m) { return m(0, 0); }
+template<std::floating_point T>
+constexpr T determinant(const Matrix<T, 1, 1> &m) { return m(0, 0); }
 
-// template<std::floating_point T>
-// constexpr T determinant(const Matrix<T, 2, 2> &m)
-// {
-// 	return m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0);
-// }
+template<std::floating_point T>
+constexpr T determinant(const Matrix<T, 2, 2> &m)
+{
+	return m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0);
+}
 
-// template<std::floating_point T>
-// constexpr T determinant(const Matrix<T, 3, 3> &m)
-// {
-// 	return m(0, 0) * (m(1, 1) * m(2, 2) - m(1, 2) * m(2, 1)) -
-// 		   m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
-// 		   m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0));
-// }
+template<std::floating_point T>
+constexpr T determinant(const Matrix<T, 3, 3> &m)
+{
+	return m(0, 0) * (m(1, 1) * m(2, 2) - m(1, 2) * m(2, 1)) -
+		   m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
+		   m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0));
+}
 
-// /** @brief Minor matrix helper */
-// template<std::floating_point T, std::size_t N>
-// constexpr Matrix < T, N - 1, N - 1 > minor_matrix(const Matrix<T, N, N> &m, std::size_t row, std::size_t col)
-// {
-// 	Matrix < T, N - 1, N - 1 > result;
+/** @brief Minor matrix helper */
+template<std::floating_point T, std::size_t N>
+constexpr Matrix < T, N - 1, N - 1 > minor_matrix(const Matrix<T, N, N> &m, std::size_t row, std::size_t col)
+{
+	Matrix < T, N - 1, N - 1 > result;
 
-// 	for (std::size_t i = 0, ri = 0; i < N; ++i) {
-// 		if (i == row) { continue; }
+	for (std::size_t i = 0, ri = 0; i < N; ++i) {
+		if (i == row) { continue; }
 
-// 		for (std::size_t j = 0, rj = 0; j < N; ++j) {
-// 			if (j == col) { continue; }
+		for (std::size_t j = 0, rj = 0; j < N; ++j) {
+			if (j == col) { continue; }
 
-// 			result(ri, rj++) = m(i, j);
-// 		}
+			result(ri, rj++) = m(i, j);
+		}
 
-// 		++ri;
-// 	}
+		++ri;
+	}
 
-// 	return result;
-// }
+	return result;
+}
 
-// /** @brief General determinant for N > 3 */
-// template<std::floating_point T, std::size_t N>
-// constexpr T determinant(const Matrix<T, N, N> &m)
-// {
-// 	T det = T{0};
+/** @brief General determinant for N > 3 */
+template<std::floating_point T, std::size_t N>
+constexpr T determinant(const Matrix<T, N, N> &m)
+{
+	T det = T{0};
 
-// 	for (std::size_t col = 0; col < N; ++col) {
-// 		const T sign = (col % 2 == 0) ? T{1} : T{-1};
-// 		det += sign * m(0, col) * determinant(minor_matrix(m, 0, col));
-// 	}
+	for (std::size_t col = 0; col < N; ++col) {
+		const T sign = (col % 2 == 0) ? T{1} : T{-1};
+		det += sign * m(0, col) * determinant(minor_matrix(m, 0, col));
+	}
 
-// 	return det;
-// }
+	return det;
+}
 
 /** @brief Symmetry check */
 template<typename T, std::size_t N>
@@ -404,33 +412,33 @@ concept SymmetricPositiveDefinite = requires(const Matrix<T, N, N> &A)
 	{ is_positive_definite(A) } -> std::same_as<bool>;
 };
 
-// /** @brief Cholesky decomposition */
-// template<std::floating_point T, std::size_t N>
-// requires SymmetricPositiveDefinite<T, N>
-// constexpr Matrix<T, N, N> cholesky(const Matrix<T, N, N> &A)
-// {
-// 	Matrix<T, N, N> L;
+/** @brief Cholesky decomposition */
+template<std::floating_point T, std::size_t N>
+requires SymmetricPositiveDefinite<T, N>
+constexpr Matrix<T, N, N> cholesky(const Matrix<T, N, N> &A)
+{
+	Matrix<T, N, N> L;
 
-// 	for (std::size_t i = 0; i < N; ++i) {
-// 		for (std::size_t j = 0; j <= i; ++j) {
-// 			T sum = 0;
+	for (std::size_t i = 0; i < N; ++i) {
+		for (std::size_t j = 0; j <= i; ++j) {
+			T sum = 0;
 
-// 			for (std::size_t k = 0; k < j; ++k) {
-// 				sum += L(i, k) * L(j, k);
-// 			}
+			for (std::size_t k = 0; k < j; ++k) {
+				sum += L(i, k) * L(j, k);
+			}
 
-// 			if (i == j) {
-// 				T val = A(i, i) - sum;
-// 				L(i, j) = std::sqrt(val);
+			if (i == j) {
+				T val = A(i, i) - sum;
+				L(i, j) = std::sqrt(val);
 
-// 			} else {
-// 				L(i, j) = (A(i, j) - sum) / L(j, j);
-// 			}
-// 		}
-// 	}
+			} else {
+				L(i, j) = (A(i, j) - sum) / L(j, j);
+			}
+		}
+	}
 
-// 	return L;
-// }
+	return L;
+}
 
 /** @brief Concept to detect a matrix expression */
 template<typename T>
