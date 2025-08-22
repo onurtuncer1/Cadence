@@ -11,13 +11,12 @@ find_package(Catch2 REQUIRED)
 add_executable(${PROJECT_NAME}Tests
   test_Matrix.cpp
   test_Vector.cpp 
-  #test_Transform.cpp
-
+  test_Transform.cpp
 )
 
 target_include_directories(${PROJECT_NAME}Tests
   PRIVATE
-    ${PROJECT_SOURCE_DIR}/  # adjust if your headers are elsewhere
+    ${PROJECT_SOURCE_DIR}/  
 )
 
 target_link_libraries(${PROJECT_NAME}Tests PRIVATE
