@@ -12,20 +12,27 @@
 using Cadence::Matrix4x4;
 using Catch::Approx;
 
-TEST_CASE("Matrix4x4 Default Constructor", "[Matrix]")
-{
-	Matrix4x4<float> mat;
+TEST_CASE("Matrix4x4 Identity factory", "[Matrix]") {
+    using Mat = Matrix4x4<float>;
+    const auto mat = Mat::identity();
 
-	for (size_t row = 0; row < 4; ++row) {
-		for (size_t col = 0; col < 4; ++col) {
-			if (row == col) {
-				REQUIRE(mat(row, col) == Approx(1.0f));
+    for (size_t row = 0; row < 4; ++row) {
+        for (size_t col = 0; col < 4; ++col) {
+            if (row == col) {
+                REQUIRE(mat(row, col) == Approx(1.0f));
+            } else {
+                REQUIRE(mat(row, col) == Approx(0.0f));
+            }
+        }
+    }
+}
 
-			} else {
-				REQUIRE(mat(row, col) == Approx(0.0f));
-			}
-		}
-	}
+TEST_CASE("Matrix4x4 Zero factory", "[Matrix]") {
+    using Mat = Matrix4x4<float>;
+    const Mat z = Mat::zero();
+    for (size_t i = 0; i < 4; ++i)
+        for (size_t j = 0; j < 4; ++j)
+            REQUIRE(z(i, j) == Approx(0.0f));
 }
 
 TEST_CASE("Matrix4x4 Assignment and Access", "[Matrix]")
@@ -45,24 +52,46 @@ TEST_CASE("Matrix4x4 Copy Constructor", "[Matrix]")
 	REQUIRE(mat2(2, 3) == Approx(7.0f));
 }
 
-TEST_CASE("Matrix4x4 Multiplication by Identity", "[Matrix]")
-{
-	Matrix4x4<float> identity;
-	Matrix4x4<float> mat;
+TEST_CASE("Matrix4x4: Identity and Zero multiplication (both sides)", "[Matrix]") {
+    using Mat = Matrix4x4<float>;
 
-	// Fill with some values
-	float val = 1.0f;
+    // Build a deterministic test matrix with distinct values
+    Mat M{};
+    {
+        float v = 1.0f;
+        for (size_t r = 0; r < 4; ++r)
+            for (size_t c = 0; c < 4; ++c)
+                M(r, c) = v++;
+    }
 
-	for (size_t r = 0; r < 4; ++r)
-		for (size_t c = 0; c < 4; ++c) {
-			mat(r, c) = val++;
-		}
+    const Mat I = Mat::identity();
+    const Mat Z = Mat::zero();
 
-	Matrix4x4<float> result = mat * identity;
+    SECTION("Right-multiply by Identity preserves M") {
+        const Mat R = M * I;
+        for (size_t r = 0; r < 4; ++r)
+            for (size_t c = 0; c < 4; ++c)
+                REQUIRE(R(r, c) == Approx(M(r, c)));
+    }
 
-	for (size_t r = 0; r < 4; ++r)
-		for (size_t c = 0; c < 4; ++c) {
-			REQUIRE(result(r, c) == Approx(mat(r, c)));
-		}
+    SECTION("Left-multiply by Identity preserves M") {
+        const Mat R = I * M;
+        for (size_t r = 0; r < 4; ++r)
+            for (size_t c = 0; c < 4; ++c)
+                REQUIRE(R(r, c) == Approx(M(r, c)));
+    }
+
+    SECTION("Right-multiply by Zero yields Zero") {
+        const Mat R = M * Z;
+        for (size_t r = 0; r < 4; ++r)
+            for (size_t c = 0; c < 4; ++c)
+                REQUIRE(R(r, c) == Approx(0.0f));
+    }
+
+    SECTION("Left-multiply by Zero yields Zero") {
+        const Mat R = Z * M;
+        for (size_t r = 0; r < 4; ++r)
+            for (size_t c = 0; c < 4; ++c)
+                REQUIRE(R(r, c) == Approx(0.0f));
+    }
 }
-

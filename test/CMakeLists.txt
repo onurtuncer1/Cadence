@@ -10,7 +10,7 @@ find_package(Catch2 REQUIRED)
 
 add_executable(${PROJECT_NAME}Tests
   test_Matrix.cpp
-  #test_Vector.cpp 
+  test_Vector.cpp 
   #test_Transform.cpp
 
 )

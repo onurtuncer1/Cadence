@@ -26,6 +26,8 @@
 namespace Cadence
 {
 
+struct NoInit{};
+
 /**
  * @class Matrix
  * @brief A class representing a mathematical matrix.
@@ -56,6 +58,9 @@ public:
 
 	/** @brief Default constructor */
 	constexpr Matrix() = default;
+
+    /** @brief Constructor without initialization */
+	constexpr Matrix(NoInit) noexcept {}
 
 	/** @brief Construct from array of values */
 	constexpr Matrix(const std::array<T, Rows *Cols> &values)
